@@ -4,5 +4,7 @@ out = 'out'
 libs = ['lib']
 evm_version = "paris"
 solc_version = "0.8.20"
+ffi = true
+
 [profile.default.fuzz]
 runs = 1000
