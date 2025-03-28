@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {AES} from "src/BlockBreakers/AES.sol";
-import {Strings2} from "test/utils/Strings2.sol";
+import {Strings2} from "test/BlockBreakers/utils/Strings2.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";

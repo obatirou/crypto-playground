@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {AES} from "src/BlockBreakers/AES.sol";
-import {Strings2} from "test/utils/Strings2.sol";
+import {Strings2} from "test/BlockBreakers/utils/Strings2.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
@@ -19,7 +19,7 @@ contract DiffTestingAES is Test {
     function call_python(string memory func_name, bytes memory input) public returns (bytes memory) {
         string[] memory inputs = new string[](4);
         inputs[0] = "python";
-        inputs[1] = "test/AES.py";
+        inputs[1] = "test/BlockBreakers/AES.py";
         inputs[2] = func_name;
         inputs[3] = input.toHexString();
         bytes memory result = vm.ffi(inputs);
