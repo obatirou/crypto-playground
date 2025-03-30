@@ -19,7 +19,7 @@ def calculate_r_con(num_values):
         # Check if MSB is set (would overflow byte)
         if prev & 0x80:
             # Apply reduction with AES polynomial
-            # Shift left and XOR with 0x1B
+            # Shift left and XOR with 0x11B
             next_val = ((prev << 1) ^ 0x11B) & 0xFF
         else:
             # Simple doubling
