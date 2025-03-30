@@ -30,4 +30,54 @@ contract TestAES is Test {
         bytes4 rcon = aes.RCon(3);
         assertEq(rcon, bytes4(0x04000000));
     }
+
+    function test_KeyExpansion() public {
+        bytes16 key = bytes16(0x2b7e151628aed2a6abf7158809cf4f3c);
+        bytes4[] memory round_keys = aes.KeyExpansion(key);
+        assertEq(round_keys.length, 44);
+        assertEq(round_keys[0], bytes4(0x2b7e1516));
+        assertEq(round_keys[1], bytes4(0x28aed2a6));
+        assertEq(round_keys[2], bytes4(0xabf71588));
+        assertEq(round_keys[3], bytes4(0x09cf4f3c));
+        assertEq(round_keys[4], bytes4(0xa0fafe17));
+        assertEq(round_keys[5], bytes4(0x88542cb1));
+        assertEq(round_keys[6], bytes4(0x23a33939));
+        assertEq(round_keys[7], bytes4(0x2a6c7605));
+        assertEq(round_keys[8], bytes4(0xf2c295f2));
+        assertEq(round_keys[9], bytes4(0x7a96b943));
+        assertEq(round_keys[10], bytes4(0x5935807a));
+        assertEq(round_keys[11], bytes4(0x7359f67f));
+        assertEq(round_keys[12], bytes4(0x3d80477d));
+        assertEq(round_keys[13], bytes4(0x4716fe3e));
+        assertEq(round_keys[14], bytes4(0x1e237e44));
+        assertEq(round_keys[15], bytes4(0x6d7a883b));
+        assertEq(round_keys[16], bytes4(0xef44a541));
+        assertEq(round_keys[17], bytes4(0xa8525b7f));
+        assertEq(round_keys[18], bytes4(0xb671253b));
+        assertEq(round_keys[19], bytes4(0xdb0bad00));
+        assertEq(round_keys[20], bytes4(0xd4d1c6f8));
+        assertEq(round_keys[21], bytes4(0x7c839d87));
+        assertEq(round_keys[22], bytes4(0xcaf2b8bc));
+        assertEq(round_keys[23], bytes4(0x11f915bc));
+        assertEq(round_keys[24], bytes4(0x6d88a37a));
+        assertEq(round_keys[25], bytes4(0x110b3efd));
+        assertEq(round_keys[26], bytes4(0xdbf98641));
+        assertEq(round_keys[27], bytes4(0xca0093fd));
+        assertEq(round_keys[28], bytes4(0x4e54f70e));
+        assertEq(round_keys[29], bytes4(0x5f5fc9f3));
+        assertEq(round_keys[30], bytes4(0x84a64fb2));
+        assertEq(round_keys[31], bytes4(0x4ea6dc4f));
+        assertEq(round_keys[32], bytes4(0xead27321));
+        assertEq(round_keys[33], bytes4(0xb58dbad2));
+        assertEq(round_keys[34], bytes4(0x312bf560));
+        assertEq(round_keys[35], bytes4(0x7f8d292f));
+        assertEq(round_keys[36], bytes4(0xac7766f3));
+        assertEq(round_keys[37], bytes4(0x19fadc21));
+        assertEq(round_keys[38], bytes4(0x28d12941));
+        assertEq(round_keys[39], bytes4(0x575c006e));
+        assertEq(round_keys[40], bytes4(0xd014f9a8));
+        assertEq(round_keys[41], bytes4(0xc9ee2589));
+        assertEq(round_keys[42], bytes4(0xe13f0cc8));
+        assertEq(round_keys[43], bytes4(0xb6630ca6));
+    }
 }
