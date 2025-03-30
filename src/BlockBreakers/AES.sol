@@ -100,4 +100,12 @@ contract AES {
     function bytes1ToBytes4(bytes1 a, bytes1 b, bytes1 c, bytes1 d) internal pure returns (bytes4) {
         return bytes4((uint32(uint8(a)) << 24) | (uint32(uint8(b)) << 16) | (uint32(uint8(c)) << 8) | uint32(uint8(d)));
     }
+
+    function subBytes(AESState memory state) public pure returns (AESState memory) {
+        state.column_0 = SubWord(state.column_0);
+        state.column_1 = SubWord(state.column_1);
+        state.column_2 = SubWord(state.column_2);
+        state.column_3 = SubWord(state.column_3);
+        return state;
+    }
 }

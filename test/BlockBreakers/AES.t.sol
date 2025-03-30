@@ -80,4 +80,18 @@ contract TestAES is Test {
         assertEq(round_keys[42], bytes4(0xe13f0cc8));
         assertEq(round_keys[43], bytes4(0xb6630ca6));
     }
+
+    function test_subBytes() public {
+        AES.AESState memory state = AES.AESState({
+            column_0: bytes4(0x00010203),
+            column_1: bytes4(0x04050607),
+            column_2: bytes4(0x08090a0b),
+            column_3: bytes4(0x0c0d0e0f)
+        });
+        AES.AESState memory aesState = aes.subBytes(state);
+        assertEq(aesState.column_0, bytes4(0x637c777b));
+        assertEq(aesState.column_1, bytes4(0xf26b6fc5));
+        assertEq(aesState.column_2, bytes4(0x3001672b));
+        assertEq(aesState.column_3, bytes4(0xfed7ab76));
+    }
 }
