@@ -13,6 +13,14 @@ contract AES {
     bytes constant r_con =
         hex"8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d";
 
+    // @notice The multiplication by 2 lookup table on the Galois field GF(2^8)
+    bytes constant mul_by_2 =
+        hex"00020406080a0c0e10121416181a1c1e20222426282a2c2e30323436383a3c3e40424446484a4c4e50525456585a5c5e60626466686a6c6e70727476787a7c7e80828486888a8c8e90929496989a9c9ea0a2a4a6a8aaacaeb0b2b4b6b8babcbec0c2c4c6c8caccced0d2d4d6d8dadcdee0e2e4e6e8eaeceef0f2f4f6f8fafcfe1b191f1d131117150b090f0d030107053b393f3d333137352b292f2d232127255b595f5d535157554b494f4d434147457b797f7d737177756b696f6d636167659b999f9d939197958b898f8d83818785bbb9bfbdb3b1b7b5aba9afada3a1a7a5dbd9dfddd3d1d7d5cbc9cfcdc3c1c7c5fbf9fffdf3f1f7f5ebe9efede3e1e7e5";
+
+    // @notice The multiplication by 3 lookup table on the Galois field GF(2^8)
+    bytes constant mul_by_3 =
+        hex"000306050c0f0a09181b1e1d14171211303336353c3f3a39282b2e2d24272221606366656c6f6a69787b7e7d74777271505356555c5f5a59484b4e4d44474241c0c3c6c5cccfcac9d8dbdeddd4d7d2d1f0f3f6f5fcfffaf9e8ebeeede4e7e2e1a0a3a6a5acafaaa9b8bbbebdb4b7b2b1909396959c9f9a99888b8e8d848782819b989d9e97949192838085868f8c898aaba8adaea7a4a1a2b3b0b5b6bfbcb9bafbf8fdfef7f4f1f2e3e0e5e6efece9eacbc8cdcec7c4c1c2d3d0d5d6dfdcd9da5b585d5e57545152434045464f4c494a6b686d6e67646162737075767f7c797a3b383d3e37343132232025262f2c292a0b080d0e07040102131015161f1c191a";
+
     // @notice The state of the AES cipher is represented as 4 bytes4
     // Each byte4 represents a column of the state
     struct AESState {
@@ -101,11 +109,63 @@ contract AES {
         return bytes4((uint32(uint8(a)) << 24) | (uint32(uint8(b)) << 16) | (uint32(uint8(c)) << 8) | uint32(uint8(d)));
     }
 
+    /// @notice Substitute each byte of the state with the corresponding value in the s-box
+    /// @param state The state to substitute
+    /// @return The substituted state
     function subBytes(AESState memory state) public pure returns (AESState memory) {
         state.column_0 = SubWord(state.column_0);
         state.column_1 = SubWord(state.column_1);
         state.column_2 = SubWord(state.column_2);
         state.column_3 = SubWord(state.column_3);
         return state;
+    }
+
+    /// @notice Shift the rows of the state
+    /// @param state The state to shift
+    /// @return The shifted state
+    ///
+    /// 0 1 2 3    0 1 2 3
+    /// 4 5 6 7 -> 5 6 7 4
+    /// 8 9 a b    a b 8 9
+    /// c d e f    f c d e
+    function shiftRows(AESState memory state) public pure returns (AESState memory) {
+        bytes4[] memory rows = new bytes4[](4);
+        rows[0] = bytes1ToBytes4(state.column_0[0], state.column_1[0], state.column_2[0], state.column_3[0]);
+        rows[1] = bytes1ToBytes4(state.column_1[1], state.column_2[1], state.column_3[1], state.column_0[1]);
+        rows[2] = bytes1ToBytes4(state.column_2[2], state.column_3[2], state.column_0[2], state.column_1[2]);
+        rows[3] = bytes1ToBytes4(state.column_3[3], state.column_0[3], state.column_1[3], state.column_2[3]);
+        state.column_0 = bytes1ToBytes4(rows[0][0], rows[1][0], rows[2][0], rows[3][0]);
+        state.column_1 = bytes1ToBytes4(rows[0][1], rows[1][1], rows[2][1], rows[3][1]);
+        state.column_2 = bytes1ToBytes4(rows[0][2], rows[1][2], rows[2][2], rows[3][2]);
+        state.column_3 = bytes1ToBytes4(rows[0][3], rows[1][3], rows[2][3], rows[3][3]);
+        return state;
+    }
+
+    /// @notice Mix the columns of the state
+    /// @param state The state to mix
+    /// @return The mixed state
+    function mixColumns(AESState memory state) public pure returns (AESState memory) {
+        state.column_0 = _mixColumn(state.column_0);
+        state.column_1 = _mixColumn(state.column_1);
+        state.column_2 = _mixColumn(state.column_2);
+        state.column_3 = _mixColumn(state.column_3);
+        return state;
+    }
+
+    /// @notice Mix the column of the state
+    /// @param column The column to mix
+    /// @return The mixed column
+    /// ┌                       ┐
+    /// │ 2a₀ + 3a₁ + 1a₂ + 1a₃ │
+    /// │ 1a₀ + 2a₁ + 3a₂ + 1a₃ │
+    /// │ 1a₀ + 1a₁ + 2a₂ + 3a₃ │
+    /// │ 3a₀ + 1a₁ + 1a₂ + 2a₃ │
+    /// └                       ┘
+    function _mixColumn(bytes4 column) internal pure returns (bytes4) {
+        bytes1 a0 = mul_by_2[uint8(column[0])] ^ mul_by_3[uint8(column[1])] ^ column[2] ^ column[3];
+        bytes1 a1 = column[0] ^ mul_by_2[uint8(column[1])] ^ mul_by_3[uint8(column[2])] ^ column[3];
+        bytes1 a2 = column[0] ^ column[1] ^ mul_by_2[uint8(column[2])] ^ mul_by_3[uint8(column[3])];
+        bytes1 a3 = mul_by_3[uint8(column[0])] ^ column[1] ^ column[2] ^ mul_by_2[uint8(column[3])];
+        return bytes1ToBytes4(a0, a1, a2, a3);
     }
 }
