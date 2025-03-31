@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "forge-std/console.sol";
+import "forge-std/console2.sol";
 
 contract AES {
     // @notice The s-box is a lookup table that maps each byte to its corresponding value
@@ -167,5 +168,21 @@ contract AES {
         bytes1 a2 = column[0] ^ column[1] ^ mul_by_2[uint8(column[2])] ^ mul_by_3[uint8(column[3])];
         bytes1 a3 = mul_by_3[uint8(column[0])] ^ column[1] ^ column[2] ^ mul_by_2[uint8(column[3])];
         return bytes1ToBytes4(a0, a1, a2, a3);
+    }
+
+    /// @notice Add the round key to the state
+    /// @param state The state to add the round key to
+    /// @param round_key The round key to add
+    /// @return The state with the round key added
+    function addRoundKey(AESState memory state, bytes16 round_key) public pure returns (AESState memory) {
+        bytes4 round_key_col_0 = bytes4(round_key);
+        bytes4 round_key_col_1 = bytes4(round_key << 32);
+        bytes4 round_key_col_2 = bytes4(round_key << 64);
+        bytes4 round_key_col_3 = bytes4(round_key << 96);
+        state.column_0 = state.column_0 ^ round_key_col_0;
+        state.column_1 = state.column_1 ^ round_key_col_1;
+        state.column_2 = state.column_2 ^ round_key_col_2;
+        state.column_3 = state.column_3 ^ round_key_col_3;
+        return state;
     }
 }

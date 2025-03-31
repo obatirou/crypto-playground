@@ -122,4 +122,19 @@ contract TestAES is Test {
         assertEq(state.column_2, bytes4(0xb0d95d61));
         assertEq(state.column_3, bytes4(0x279c215c));
     }
+
+    function test_addRoundKey() public {
+        AES.AESState memory state = AES.AESState({
+            column_0: bytes4(0x6a6a5c45),
+            column_1: bytes4(0x2c6d3351),
+            column_2: bytes4(0xb0d95d61),
+            column_3: bytes4(0x279c215c)
+        });
+        bytes16 round_key = bytes16(0xd6aa74fdd2af72fadaa678f1d6ab76fe);
+        state = aes.addRoundKey(state, round_key);
+        assertEq(state.column_0, bytes4(0xbcc028b8));
+        assertEq(state.column_1, bytes4(0xfec241ab));
+        assertEq(state.column_2, bytes4(0x6a7f2590));
+        assertEq(state.column_3, bytes4(0xf13757a2));
+    }
 }
