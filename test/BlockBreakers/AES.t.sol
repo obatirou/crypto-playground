@@ -14,20 +14,20 @@ contract TestAES is Test {
         aes = new AES();
     }
 
-    function test_RotWord() public {
+    function test_rotWord() public {
         bytes4 word = bytes4(0x12345678);
-        bytes4 rotWord = aes.RotWord(word);
+        bytes4 rotWord = aes.rotWord(word);
         assertEq(rotWord, bytes4(0x34567812));
     }
 
-    function test_SubWord() public {
+    function test_subWord() public {
         bytes4 word = bytes4(0x68d6a2a8);
-        bytes4 subWord = aes.SubWord(word);
+        bytes4 subWord = aes.subWord(word);
         assertEq(subWord, bytes4(0x45f63ac2));
     }
 
-    function test_Rcon() public {
-        bytes4 rcon = aes.RCon(3);
+    function test_rcon() public {
+        bytes4 rcon = aes.rcon(3);
         assertEq(rcon, bytes4(0x04000000));
     }
 

@@ -17,6 +17,3 @@ test :; forge test
 snapshot :; forge snapshot
 
 format :; forge fmt
-
-build-rust:
-	cd rust && cargo build --release

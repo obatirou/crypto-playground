@@ -31,7 +31,7 @@ contract AES {
     /// @notice Rotate a 4-byte word left by 8 bits
     /// @param word The word to rotate
     /// @return The rotated word
-    function RotWord(bytes4 word) public pure returns (bytes4) {
+    function rotWord(bytes4 word) public pure returns (bytes4) {
         uint32 w = uint32(word);
         // OR the word shifted left by 8 bits and the word shifted right by 24 bits
         // Ex:
@@ -45,7 +45,7 @@ contract AES {
     /// @return The substituted word
     /// @dev The s-box is a lookup table that maps each byte to its corresponding value
     /// In this case, the s-box was flattened to a single bytes constant
-    function SubWord(bytes4 word) public pure returns (bytes4) {
+    function subWord(bytes4 word) public pure returns (bytes4) {
         uint32 result;
         for (uint8 i = 0; i < 4; i++) {
             uint8 value = uint8(s_box[uint8(word[i])]);
@@ -57,7 +57,7 @@ contract AES {
     /// @notice Generate the round constant for the given round
     /// @param round The round number
     /// @return The round constant
-    function RCon(uint256 round) public pure returns (bytes4) {
+    function rcon(uint256 round) public pure returns (bytes4) {
         uint32 rcon_byte = uint32(uint8(r_con[round]));
         return bytes4(rcon_byte << 24);
     }
@@ -76,10 +76,10 @@ contract AES {
         uint256 round_number = 1;
         for (uint8 i = 4; i < 41; i += 4) {
             bytes4 temp = round_keys[i - 1];
-            temp = RotWord(temp);
-            temp = SubWord(temp);
+            temp = rotWord(temp);
+            temp = subWord(temp);
             temp = temp ^ round_keys[i - 4];
-            temp = temp ^ RCon(round_number);
+            temp = temp ^ rcon(round_number);
             round_keys[i] = temp;
             // To obtain the other (3) columns of a round key, XOR the previous
             // column with the previous round key's column of the same index
@@ -111,10 +111,10 @@ contract AES {
     /// @param state The state to substitute
     /// @return The substituted state
     function subBytes(AESState memory state) public pure returns (AESState memory) {
-        state.column_0 = SubWord(state.column_0);
-        state.column_1 = SubWord(state.column_1);
-        state.column_2 = SubWord(state.column_2);
-        state.column_3 = SubWord(state.column_3);
+        state.column_0 = subWord(state.column_0);
+        state.column_1 = subWord(state.column_1);
+        state.column_2 = subWord(state.column_2);
+        state.column_3 = subWord(state.column_3);
         return state;
     }
 
