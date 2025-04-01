@@ -67,7 +67,7 @@ contract AES {
     /// The first round key is the original key.
     /// @param key The key to expand
     /// @return The list of round keys
-    function KeyExpansion(bytes16 key) public pure returns (bytes4[] memory) {
+    function keyExpansion(bytes16 key) public pure returns (bytes4[] memory) {
         bytes4[] memory round_keys = new bytes4[](44);
         round_keys[0] = _bytes1ToBytes4(key[0], key[1], key[2], key[3]);
         round_keys[1] = _bytes1ToBytes4(key[4], key[5], key[6], key[7]);
@@ -202,7 +202,7 @@ contract AES {
             _bytes1ToBytes4(plaintext[8], plaintext[9], plaintext[10], plaintext[11]),
             _bytes1ToBytes4(plaintext[12], plaintext[13], plaintext[14], plaintext[15])
         );
-        bytes4[] memory round_keys = KeyExpansion(key);
+        bytes4[] memory round_keys = keyExpansion(key);
         bytes16 round_key = _bytes4ToBytes16(round_keys[0], round_keys[1], round_keys[2], round_keys[3]);
         state = addRoundKey(state, round_key);
 

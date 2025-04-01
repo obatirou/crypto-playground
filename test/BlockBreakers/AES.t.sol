@@ -31,9 +31,9 @@ contract TestAES is Test {
         assertEq(rcon, bytes4(0x04000000));
     }
 
-    function test_KeyExpansion() public {
+    function test_keyExpansion() public {
         bytes16 key = bytes16(0x2b7e151628aed2a6abf7158809cf4f3c);
-        bytes4[] memory round_keys = aes.KeyExpansion(key);
+        bytes4[] memory round_keys = aes.keyExpansion(key);
         assertEq(round_keys.length, 44);
         assertEq(round_keys[0], bytes4(0x2b7e1516));
         assertEq(round_keys[1], bytes4(0x28aed2a6));
