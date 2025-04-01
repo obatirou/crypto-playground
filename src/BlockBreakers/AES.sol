@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.19;
 
-import "forge-std/console.sol";
-import "forge-std/console2.sol";
-
 contract AES {
     // @notice The s-box is a lookup table that maps each byte to its corresponding value
     bytes constant s_box =
@@ -72,10 +69,10 @@ contract AES {
     /// @return The list of round keys
     function KeyExpansion(bytes16 key) public pure returns (bytes4[] memory) {
         bytes4[] memory round_keys = new bytes4[](44);
-        round_keys[0] = bytes1ToBytes4(key[0], key[1], key[2], key[3]);
-        round_keys[1] = bytes1ToBytes4(key[4], key[5], key[6], key[7]);
-        round_keys[2] = bytes1ToBytes4(key[8], key[9], key[10], key[11]);
-        round_keys[3] = bytes1ToBytes4(key[12], key[13], key[14], key[15]);
+        round_keys[0] = _bytes1ToBytes4(key[0], key[1], key[2], key[3]);
+        round_keys[1] = _bytes1ToBytes4(key[4], key[5], key[6], key[7]);
+        round_keys[2] = _bytes1ToBytes4(key[8], key[9], key[10], key[11]);
+        round_keys[3] = _bytes1ToBytes4(key[12], key[13], key[14], key[15]);
         uint256 round_number = 1;
         for (uint8 i = 4; i < 41; i += 4) {
             bytes4 temp = round_keys[i - 1];
@@ -106,7 +103,7 @@ contract AES {
         return round_keys;
     }
 
-    function bytes1ToBytes4(bytes1 a, bytes1 b, bytes1 c, bytes1 d) internal pure returns (bytes4) {
+    function _bytes1ToBytes4(bytes1 a, bytes1 b, bytes1 c, bytes1 d) internal pure returns (bytes4) {
         return bytes4((uint32(uint8(a)) << 24) | (uint32(uint8(b)) << 16) | (uint32(uint8(c)) << 8) | uint32(uint8(d)));
     }
 
@@ -131,14 +128,14 @@ contract AES {
     /// c d e f    f c d e
     function shiftRows(AESState memory state) public pure returns (AESState memory) {
         bytes4[] memory rows = new bytes4[](4);
-        rows[0] = bytes1ToBytes4(state.column_0[0], state.column_1[0], state.column_2[0], state.column_3[0]);
-        rows[1] = bytes1ToBytes4(state.column_1[1], state.column_2[1], state.column_3[1], state.column_0[1]);
-        rows[2] = bytes1ToBytes4(state.column_2[2], state.column_3[2], state.column_0[2], state.column_1[2]);
-        rows[3] = bytes1ToBytes4(state.column_3[3], state.column_0[3], state.column_1[3], state.column_2[3]);
-        state.column_0 = bytes1ToBytes4(rows[0][0], rows[1][0], rows[2][0], rows[3][0]);
-        state.column_1 = bytes1ToBytes4(rows[0][1], rows[1][1], rows[2][1], rows[3][1]);
-        state.column_2 = bytes1ToBytes4(rows[0][2], rows[1][2], rows[2][2], rows[3][2]);
-        state.column_3 = bytes1ToBytes4(rows[0][3], rows[1][3], rows[2][3], rows[3][3]);
+        rows[0] = _bytes1ToBytes4(state.column_0[0], state.column_1[0], state.column_2[0], state.column_3[0]);
+        rows[1] = _bytes1ToBytes4(state.column_1[1], state.column_2[1], state.column_3[1], state.column_0[1]);
+        rows[2] = _bytes1ToBytes4(state.column_2[2], state.column_3[2], state.column_0[2], state.column_1[2]);
+        rows[3] = _bytes1ToBytes4(state.column_3[3], state.column_0[3], state.column_1[3], state.column_2[3]);
+        state.column_0 = _bytes1ToBytes4(rows[0][0], rows[1][0], rows[2][0], rows[3][0]);
+        state.column_1 = _bytes1ToBytes4(rows[0][1], rows[1][1], rows[2][1], rows[3][1]);
+        state.column_2 = _bytes1ToBytes4(rows[0][2], rows[1][2], rows[2][2], rows[3][2]);
+        state.column_3 = _bytes1ToBytes4(rows[0][3], rows[1][3], rows[2][3], rows[3][3]);
         return state;
     }
 
@@ -167,7 +164,7 @@ contract AES {
         bytes1 a1 = column[0] ^ mul_by_2[uint8(column[1])] ^ mul_by_3[uint8(column[2])] ^ column[3];
         bytes1 a2 = column[0] ^ column[1] ^ mul_by_2[uint8(column[2])] ^ mul_by_3[uint8(column[3])];
         bytes1 a3 = mul_by_3[uint8(column[0])] ^ column[1] ^ column[2] ^ mul_by_2[uint8(column[3])];
-        return bytes1ToBytes4(a0, a1, a2, a3);
+        return _bytes1ToBytes4(a0, a1, a2, a3);
     }
 
     /// @notice Add the round key to the state
@@ -184,5 +181,53 @@ contract AES {
         state.column_2 = state.column_2 ^ round_key_col_2;
         state.column_3 = state.column_3 ^ round_key_col_3;
         return state;
+    }
+
+    /// @notice Encrypt the plaintext using the key
+    /// @param key The key to encrypt the plaintext with
+    /// @param plaintext The plaintext to encrypt
+    /// @return The encrypted plaintext
+    /// Step 1: Add the round key to the plaintext
+    /// Step 2: 9 times do the following:
+    ///     Step 2.1: SubBytes
+    ///     Step 2.2: ShiftRows
+    ///     Step 2.3: MixColumns
+    ///     Step 2.4: AddRoundKey (with the corresponding round key)
+    /// Step 3: Like step 2 but without MixColumns
+    function encrypt(bytes16 key, bytes16 plaintext) public pure returns (bytes memory) {
+        // Step 1
+        AESState memory state = AESState(
+            _bytes1ToBytes4(plaintext[0], plaintext[1], plaintext[2], plaintext[3]),
+            _bytes1ToBytes4(plaintext[4], plaintext[5], plaintext[6], plaintext[7]),
+            _bytes1ToBytes4(plaintext[8], plaintext[9], plaintext[10], plaintext[11]),
+            _bytes1ToBytes4(plaintext[12], plaintext[13], plaintext[14], plaintext[15])
+        );
+        bytes4[] memory round_keys = KeyExpansion(key);
+        bytes16 round_key = _bytes4ToBytes16(round_keys[0], round_keys[1], round_keys[2], round_keys[3]);
+        state = addRoundKey(state, round_key);
+
+        // Step 2
+        for (uint8 i = 1; i < 10; i++) {
+            state = subBytes(state);
+            state = shiftRows(state);
+            state = mixColumns(state);
+            round_key =
+                _bytes4ToBytes16(round_keys[i * 4], round_keys[i * 4 + 1], round_keys[i * 4 + 2], round_keys[i * 4 + 3]);
+            state = addRoundKey(state, round_key);
+        }
+
+        // Step 3
+        state = subBytes(state);
+        state = shiftRows(state);
+        round_key = _bytes4ToBytes16(round_keys[40], round_keys[41], round_keys[42], round_keys[43]);
+        state = addRoundKey(state, round_key);
+        return abi.encodePacked(state.column_0, state.column_1, state.column_2, state.column_3);
+    }
+
+    function _bytes4ToBytes16(bytes4 key0, bytes4 key1, bytes4 key2, bytes4 key3) public pure returns (bytes16) {
+        return bytes16(
+            (uint128(uint32(key0)) << 96) | (uint128(uint32(key1)) << 64) | (uint128(uint32(key2)) << 32)
+                | uint128(uint32(key3))
+        );
     }
 }

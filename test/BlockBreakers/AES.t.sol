@@ -137,4 +137,12 @@ contract TestAES is Test {
         assertEq(state.column_2, bytes4(0x6a7f2590));
         assertEq(state.column_3, bytes4(0xf13757a2));
     }
+
+    function test_encrypt() public {
+        bytes16 plaintext = bytes16(0x746865626c6f636b627265616b657273);
+        bytes16 key = bytes16(0x2b7e151628aed2a6abf7158809cf4f3c);
+        bytes memory ciphertext = aes.encrypt(key, plaintext);
+        bytes memory expected = hex"c69f25d0025a9ef32393f63e2f05b747";
+        assertEq(ciphertext, expected);
+    }
 }
