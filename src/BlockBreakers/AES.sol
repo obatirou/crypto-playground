@@ -2,20 +2,24 @@
 pragma solidity ^0.8.19;
 
 contract AES {
-    // @notice The s-box is a lookup table that maps each byte to its corresponding value
+    /* -------------------------------------------------------------------------- */
+    /*                                  Constants                                 */
+    /* -------------------------------------------------------------------------- */
+
+    // @notice Substitution box for SubBytes transformation
     bytes constant S_BOX =
         hex"637c777bf26b6fc53001672bfed7ab76ca82c97dfa5947f0add4a2af9ca472c0b7fd9326363ff7cc34a5e5f171d8311504c723c31896059a071280e2eb27b27509832c1a1b6e5aa0523bd6b329e32f8453d100ed20fcb15b6acbbe394a4c58cfd0efaafb434d338545f9027f503c9fa851a3408f929d38f5bcb6da2110fff3d2cd0c13ec5f974417c4a77e3d645d197360814fdc222a908846eeb814de5e0bdbe0323a0a4906245cc2d3ac629195e479e7c8376d8dd54ea96c56f4ea657aae08ba78252e1ca6b4c6e8dd741f4bbd8b8a703eb5664803f60e613557b986c11d9ee1f8981169d98e949b1e87e9ce5528df8ca1890dbfe6426841992d0fb054bb16";
 
-    // @notice The round constant is a lookup table that maps each round to its corresponding value
+    // @notice Round constants lookup table
     // See AESUtils.py for explanation: calculate_r_con(256)
     bytes constant R_CON =
         hex"8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d01020408102040801b366cd8ab4d9a2f5ebc63c697356ad4b37dfaefc5913972e4d3bd61c29f254a943366cc831d3a74e8cb8d";
 
-    // @notice The multiplication by 2 lookup table on the Galois field GF(2^8)
+    // @notice Lookup table for multiplication by 2 in GF(2^8)
     bytes constant MUL_BY_2 =
         hex"00020406080a0c0e10121416181a1c1e20222426282a2c2e30323436383a3c3e40424446484a4c4e50525456585a5c5e60626466686a6c6e70727476787a7c7e80828486888a8c8e90929496989a9c9ea0a2a4a6a8aaacaeb0b2b4b6b8babcbec0c2c4c6c8caccced0d2d4d6d8dadcdee0e2e4e6e8eaeceef0f2f4f6f8fafcfe1b191f1d131117150b090f0d030107053b393f3d333137352b292f2d232127255b595f5d535157554b494f4d434147457b797f7d737177756b696f6d636167659b999f9d939197958b898f8d83818785bbb9bfbdb3b1b7b5aba9afada3a1a7a5dbd9dfddd3d1d7d5cbc9cfcdc3c1c7c5fbf9fffdf3f1f7f5ebe9efede3e1e7e5";
 
-    // @notice The multiplication by 3 lookup table on the Galois field GF(2^8)
+    // @notice Lookup table for multiplication by 3 in GF(2^8)
     bytes constant MUL_BY_3 =
         hex"000306050c0f0a09181b1e1d14171211303336353c3f3a39282b2e2d24272221606366656c6f6a69787b7e7d74777271505356555c5f5a59484b4e4d44474241c0c3c6c5cccfcac9d8dbdeddd4d7d2d1f0f3f6f5fcfffaf9e8ebeeede4e7e2e1a0a3a6a5acafaaa9b8bbbebdb4b7b2b1909396959c9f9a99888b8e8d848782819b989d9e97949192838085868f8c898aaba8adaea7a4a1a2b3b0b5b6bfbcb9bafbf8fdfef7f4f1f2e3e0e5e6efece9eacbc8cdcec7c4c1c2d3d0d5d6dfdcd9da5b585d5e57545152434045464f4c494a6b686d6e67646162737075767f7c797a3b383d3e37343132232025262f2c292a0b080d0e07040102131015161f1c191a";
 
@@ -27,6 +31,10 @@ contract AES {
         bytes4 col2;
         bytes4 col3;
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                           Key schedule functions                           */
+    /* -------------------------------------------------------------------------- */
 
     /// @notice Rotate a 4-byte word left by 8 bits
     /// @param word The word to rotate
@@ -103,6 +111,10 @@ contract AES {
         return round_keys;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                       State transformation functions                       */
+    /* -------------------------------------------------------------------------- */
+
     /// @notice Substitute each byte of the state with the corresponding value in the s-box
     /// @param state The state to substitute
     /// @return The substituted state
@@ -117,7 +129,6 @@ contract AES {
     /// @notice Shift the rows of the state
     /// @param state The state to shift
     /// @return The shifted state
-    ///
     /// 0 1 2 3    0 1 2 3
     /// 4 5 6 7 -> 5 6 7 4
     /// 8 9 a b    a b 8 9
@@ -183,6 +194,10 @@ contract AES {
         return state;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                  Encryption                                */
+    /* -------------------------------------------------------------------------- */
+
     /// @notice Encrypt the plaintext using the key
     /// @param key The key to encrypt the plaintext with
     /// @param plaintext The plaintext to encrypt
@@ -228,6 +243,10 @@ contract AES {
         state = addRoundKey(state, round_key);
         return abi.encodePacked(state.col0, state.col1, state.col2, state.col3);
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   Helpers                                  */
+    /* -------------------------------------------------------------------------- */
 
     /// @notice Convert 4 bytes1 to a bytes4
     /// @param a The first byte
