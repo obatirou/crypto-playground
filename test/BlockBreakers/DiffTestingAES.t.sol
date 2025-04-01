@@ -15,7 +15,10 @@ contract DiffTestingAES is Test {
         aes = new AES();
     }
 
-    function call_python(string memory func_name, bytes memory input) public returns (bytes memory) {
+    function call_python(string memory func_name, bytes memory input)
+        public
+        returns (bytes memory)
+    {
         string[] memory inputs = new string[](4);
         inputs[0] = "python";
         inputs[1] = "test/BlockBreakers/AES.py";

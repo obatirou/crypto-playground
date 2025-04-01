@@ -83,59 +83,59 @@ contract TestAES is Test {
 
     function test_subBytes() public {
         AES.AESState memory state = AES.AESState({
-            column_0: bytes4(0x00010203),
-            column_1: bytes4(0x04050607),
-            column_2: bytes4(0x08090a0b),
-            column_3: bytes4(0x0c0d0e0f)
+            col0: bytes4(0x00010203),
+            col1: bytes4(0x04050607),
+            col2: bytes4(0x08090a0b),
+            col3: bytes4(0x0c0d0e0f)
         });
         AES.AESState memory aesState = aes.subBytes(state);
-        assertEq(aesState.column_0, bytes4(0x637c777b));
-        assertEq(aesState.column_1, bytes4(0xf26b6fc5));
-        assertEq(aesState.column_2, bytes4(0x3001672b));
-        assertEq(aesState.column_3, bytes4(0xfed7ab76));
+        assertEq(aesState.col0, bytes4(0x637c777b));
+        assertEq(aesState.col1, bytes4(0xf26b6fc5));
+        assertEq(aesState.col2, bytes4(0x3001672b));
+        assertEq(aesState.col3, bytes4(0xfed7ab76));
     }
 
     function test_shiftRows() public {
         AES.AESState memory state = AES.AESState({
-            column_0: bytes4(0x637c777b),
-            column_1: bytes4(0xf26b6fc5),
-            column_2: bytes4(0x3001672b),
-            column_3: bytes4(0xfed7ab76)
+            col0: bytes4(0x637c777b),
+            col1: bytes4(0xf26b6fc5),
+            col2: bytes4(0x3001672b),
+            col3: bytes4(0xfed7ab76)
         });
         state = aes.shiftRows(state);
-        assertEq(state.column_0, bytes4(0x636b6776));
-        assertEq(state.column_1, bytes4(0xf201ab7b));
-        assertEq(state.column_2, bytes4(0x30d777c5));
-        assertEq(state.column_3, bytes4(0xfe7c6f2b));
+        assertEq(state.col0, bytes4(0x636b6776));
+        assertEq(state.col1, bytes4(0xf201ab7b));
+        assertEq(state.col2, bytes4(0x30d777c5));
+        assertEq(state.col3, bytes4(0xfe7c6f2b));
     }
 
     function test_mixColumns() public {
         AES.AESState memory state = AES.AESState({
-            column_0: bytes4(0x636b6776),
-            column_1: bytes4(0xf201ab7b),
-            column_2: bytes4(0x30d777c5),
-            column_3: bytes4(0xfe7c6f2b)
+            col0: bytes4(0x636b6776),
+            col1: bytes4(0xf201ab7b),
+            col2: bytes4(0x30d777c5),
+            col3: bytes4(0xfe7c6f2b)
         });
         state = aes.mixColumns(state);
-        assertEq(state.column_0, bytes4(0x6a6a5c45));
-        assertEq(state.column_1, bytes4(0x2c6d3351));
-        assertEq(state.column_2, bytes4(0xb0d95d61));
-        assertEq(state.column_3, bytes4(0x279c215c));
+        assertEq(state.col0, bytes4(0x6a6a5c45));
+        assertEq(state.col1, bytes4(0x2c6d3351));
+        assertEq(state.col2, bytes4(0xb0d95d61));
+        assertEq(state.col3, bytes4(0x279c215c));
     }
 
     function test_addRoundKey() public {
         AES.AESState memory state = AES.AESState({
-            column_0: bytes4(0x6a6a5c45),
-            column_1: bytes4(0x2c6d3351),
-            column_2: bytes4(0xb0d95d61),
-            column_3: bytes4(0x279c215c)
+            col0: bytes4(0x6a6a5c45),
+            col1: bytes4(0x2c6d3351),
+            col2: bytes4(0xb0d95d61),
+            col3: bytes4(0x279c215c)
         });
         bytes16 round_key = bytes16(0xd6aa74fdd2af72fadaa678f1d6ab76fe);
         state = aes.addRoundKey(state, round_key);
-        assertEq(state.column_0, bytes4(0xbcc028b8));
-        assertEq(state.column_1, bytes4(0xfec241ab));
-        assertEq(state.column_2, bytes4(0x6a7f2590));
-        assertEq(state.column_3, bytes4(0xf13757a2));
+        assertEq(state.col0, bytes4(0xbcc028b8));
+        assertEq(state.col1, bytes4(0xfec241ab));
+        assertEq(state.col2, bytes4(0x6a7f2590));
+        assertEq(state.col3, bytes4(0xf13757a2));
     }
 
     function test_encrypt() public {

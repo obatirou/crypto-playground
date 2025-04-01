@@ -6,5 +6,8 @@ evm_version = "paris"
 solc_version = "0.8.20"
 ffi = true
 
+[fmt]
+line_length = 100
+
 [profile.default.fuzz]
 runs = 1000
