@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import {PrimeFieldArithmetic} from "src/Primitives/PrimeFIeldArithmetic.sol";
+import {PrimeFieldArithmetic} from "src/Primitives/PrimeFieldArithmetic.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract TestPrimeFIeldArithmetic is Test {
@@ -14,7 +14,7 @@ contract TestPrimeFIeldArithmetic is Test {
     {
         string[] memory inputs = new string[](6);
         inputs[0] = "python";
-        inputs[1] = "test/Primitives/PrimeFIeldArithmetic.py";
+        inputs[1] = "test/Primitives/PrimeFieldArithmetic.py";
         inputs[2] = func_name;
         inputs[3] = vm.toString(a);
         inputs[4] = vm.toString(b);
